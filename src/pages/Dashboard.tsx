@@ -66,6 +66,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<'profile' | 'requests'>('profile');
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   // Form states
   const [fullName, setFullName] = useState('');
@@ -94,6 +96,9 @@ export default function Dashboard() {
     if (!user) return;
 
     try {
+      setError(null);
+      console.log('Fetching profile for user:', user.id);
+
       // Fetch profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -101,12 +106,20 @@ export default function Dashboard() {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (profileError) throw profileError;
-      
+      if (profileError) {
+        console.error('Profile fetch error:', profileError);
+        throw profileError;
+      }
+
       if (profileData) {
+        console.log('Profile data loaded:', profileData);
         setProfile(profileData);
         setFullName(profileData.full_name);
         setPhone(profileData.phone || '');
+      } else {
+        console.warn('No profile data found for user');
+        setError('Profile not found. Please try refreshing the page.');
+        return;
       }
 
       // If worker, fetch worker profile
@@ -156,9 +169,16 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.error('Error fetching data:', error);
+      setError('Failed to load profile data. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRetry = () => {
+    setRetryCount(prev => prev + 1);
+    setLoading(true);
+    fetchData();
   };
 
   const handleSaveProfile = async () => {
@@ -181,12 +201,12 @@ export default function Dashboard() {
 
       // Translate all texts at once
       const translations = await translateTexts(textsToTranslate);
-      
+
       // Map translations by field for easy access
       const translationMap = new Map(translations.map(t => [t.field, t]));
 
       const nameTranslation = translationMap.get('full_name');
-      
+
       // Update profile with translation data
       const { error: profileError } = await supabase
         .from('profiles')
@@ -275,8 +295,8 @@ export default function Dashboard() {
 
       toast({
         title: action === 'accepted' ? 'Request Accepted' : 'Request Declined',
-        description: action === 'accepted' 
-          ? 'The customer has been notified.' 
+        description: action === 'accepted'
+          ? 'The customer has been notified.'
           : 'The request has been declined.',
       });
 
@@ -311,8 +331,54 @@ export default function Dashboard() {
     );
   }
 
-  if (!user || !profile) {
+  if (!user) {
     return null;
+  }
+
+  // Show error state with retry option
+  if (error || !profile) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="pt-24 pb-16">
+          <div className="container mx-auto px-4">
+            <div className="max-w-md mx-auto text-center">
+              <div className="card-elevated p-8">
+                <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+                  <XCircle className="w-8 h-8 text-destructive" />
+                </div>
+                <h2 className="text-xl font-bold text-foreground mb-2">
+                  {error || 'Unable to Load Profile'}
+                </h2>
+                <p className="text-muted-foreground mb-6">
+                  We couldn't load your profile data. This might be a temporary issue.
+                </p>
+                <div className="space-y-3">
+                  <Button onClick={handleRetry} className="w-full">
+                    <Loader2 className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                    Try Again
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleSignOut}
+                    className="w-full"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </Button>
+                </div>
+                {retryCount > 0 && (
+                  <p className="text-xs text-muted-foreground mt-4">
+                    Retry attempts: {retryCount}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   const isWorker = profile.role === 'worker';
@@ -340,11 +406,10 @@ export default function Dashboard() {
                 <nav className="space-y-2">
                   <button
                     onClick={() => setActiveTab('profile')}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                      activeTab === 'profile'
-                        ? 'bg-primary text-primary-foreground'
-                        : 'hover:bg-secondary text-foreground'
-                    }`}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'profile'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'hover:bg-secondary text-foreground'
+                      }`}
                   >
                     <User className="w-4 h-4" />
                     Profile
@@ -352,11 +417,10 @@ export default function Dashboard() {
                   {isWorker && (
                     <button
                       onClick={() => setActiveTab('requests')}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                        activeTab === 'requests'
-                          ? 'bg-primary text-primary-foreground'
-                          : 'hover:bg-secondary text-foreground'
-                      }`}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'requests'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'hover:bg-secondary text-foreground'
+                        }`}
                     >
                       <MessageSquare className="w-4 h-4" />
                       Hire Requests
@@ -522,11 +586,10 @@ export default function Dashboard() {
                               key={category.id}
                               type="button"
                               onClick={() => toggleSkill(category.id)}
-                              className={`px-4 py-2 rounded-lg border-2 font-medium transition-all ${
-                                selectedSkills.includes(category.id)
-                                  ? 'border-primary bg-primary/10 text-primary'
-                                  : 'border-border hover:border-primary/50 text-foreground'
-                              }`}
+                              className={`px-4 py-2 rounded-lg border-2 font-medium transition-all ${selectedSkills.includes(category.id)
+                                ? 'border-primary bg-primary/10 text-primary'
+                                : 'border-border hover:border-primary/50 text-foreground'
+                                }`}
                             >
                               {category.name}
                             </button>
@@ -560,13 +623,12 @@ export default function Dashboard() {
                               </p>
                             </div>
                             <span
-                              className={`px-3 py-1 rounded-full text-sm font-medium capitalize ${
-                                request.status === 'pending'
-                                  ? 'bg-accent/10 text-accent'
-                                  : request.status === 'accepted'
+                              className={`px-3 py-1 rounded-full text-sm font-medium capitalize ${request.status === 'pending'
+                                ? 'bg-accent/10 text-accent'
+                                : request.status === 'accepted'
                                   ? 'bg-success/10 text-success'
                                   : 'bg-destructive/10 text-destructive'
-                              }`}
+                                }`}
                             >
                               {request.status}
                             </span>

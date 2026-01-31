@@ -93,6 +93,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     role: 'worker' | 'customer'
   ) => {
     try {
+      console.log('Starting signup process for:', email, 'as', role);
+
       const translation = await translateText([
         { field: 'full_name', value: fullName },
       ]);
@@ -112,34 +114,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       });
 
-      if (error) throw error;
-      if (!data.user) throw new Error('User not created');
+      if (error) {
+        console.error('Auth signup error:', error);
+        throw error;
+      }
+      if (!data.user) {
+        console.error('No user data returned from signup');
+        throw new Error('User not created');
+      }
+
+      console.log('User created successfully:', data.user.id);
 
       // ✅ CORRECT PROFILE INSERT
-     const { error: profileError } = await supabase
-  .from('profiles')
-  .insert([
-    {
-      user_id: data.user.id,
-      email,
-      full_name: translatedName,
-      full_name_original: nameData?.isTranslated ? fullName : null,
-      full_name_language: nameData?.detectedLanguage ?? null,
-      role,
-    },
-  ]);
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert([
+          {
+            user_id: data.user.id,
+            email,
+            full_name: translatedName,
+            full_name_original: nameData?.isTranslated ? fullName : null,
+            full_name_language: nameData?.detectedLanguage ?? null,
+            role,
+          },
+        ]);
 
-if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile creation error:', profileError);
+        throw profileError;
+      }
+
+      console.log('Profile created successfully');
 
       // Worker profile (only if worker)
       if (role === 'worker') {
-        await supabase.from('worker_profiles').insert({
-          user_id: data.user.id, // OK if this column exists
+        const { error: workerError } = await supabase.from('worker_profiles').insert({
+          user_id: data.user.id,
         });
+
+        if (workerError) {
+          console.error('Worker profile creation error:', workerError);
+          throw workerError;
+        }
+
+        console.log('Worker profile created successfully');
       }
 
       return { error: null };
     } catch (err) {
+      console.error('Signup process failed:', err);
       return { error: err as Error };
     }
   };
