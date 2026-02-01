@@ -17,7 +17,7 @@ export type Database = {
       hire_requests: {
         Row: {
           created_at: string
-          hirer_id: string
+          customer_id: string
           id: string
           message: string | null
           message_language: string | null
@@ -28,7 +28,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          hirer_id: string
+          customer_id: string
           id?: string
           message?: string | null
           message_language?: string | null
@@ -39,7 +39,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          hirer_id?: string
+          customer_id?: string
           id?: string
           message?: string | null
           message_language?: string | null
@@ -106,7 +106,7 @@ export type Database = {
           comment_language: string | null
           comment_original: string | null
           created_at: string
-          hirer_id: string
+          customer_id: string
           id: string
           rating: number
           worker_id: string
@@ -116,7 +116,7 @@ export type Database = {
           comment_language?: string | null
           comment_original?: string | null
           created_at?: string
-          hirer_id: string
+          customer_id: string
           id?: string
           rating: number
           worker_id: string
@@ -126,7 +126,7 @@ export type Database = {
           comment_language?: string | null
           comment_original?: string | null
           created_at?: string
-          hirer_id?: string
+          customer_id?: string
           id?: string
           rating?: number
           worker_id?: string
@@ -258,7 +258,7 @@ export type Database = {
       | "carpenter"
       | "babysitter"
       | "caretaker"
-      user_role: "worker" | "hirer"
+      user_role: "worker" | "customer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -398,7 +398,7 @@ export const Constants = {
         "babysitter",
         "caretaker",
       ],
-      user_role: ["worker", "hirer"],
+      user_role: ["worker", "customer"],
     },
   },
 } as const

@@ -18,7 +18,7 @@ interface AuthContextType {
     email: string,
     password: string,
     fullName: string,
-    role: 'worker' | 'hirer'
+    role: 'worker' | 'customer'
   ) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -90,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     email: string,
     password: string,
     fullName: string,
-    role: 'worker' | 'hirer'
+    role: 'worker' | 'customer'
   ) => {
     try {
       console.log('Starting signup process for:', email, 'as', role);

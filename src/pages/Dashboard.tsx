@@ -159,7 +159,7 @@ export default function Dashboard() {
               message,
               status,
               created_at,
-              profiles:hirer_id (full_name)
+              profiles:customer_id (full_name)
             `)
             .eq('worker_id', workerData.id)
             .order('created_at', { ascending: false });
@@ -296,7 +296,7 @@ export default function Dashboard() {
       toast({
         title: action === 'accepted' ? 'Request Accepted' : 'Request Declined',
         description: action === 'accepted'
-          ? 'The hirer has been notified.'
+          ? 'The customer has been notified.'
           : 'The request has been declined.',
       });
 
@@ -512,7 +512,7 @@ export default function Dashboard() {
                               id="bio"
                               value={bio}
                               onChange={(e) => setBio(e.target.value)}
-                              placeholder="Tell hirers about yourself, your experience, and what makes you great... (You can type in any Indian language)"
+                              placeholder="Tell customers about yourself, your experience, and what makes you great... (You can type in any Indian language)"
                               rows={4}
                             />
                             <p className="text-xs text-muted-foreground flex items-center gap-1">
@@ -615,7 +615,7 @@ export default function Dashboard() {
                           <div className="flex items-start justify-between mb-4">
                             <div>
                               <h3 className="font-semibold text-foreground">
-                                {request.profiles?.full_name || 'Hirer'}
+                                {request.profiles?.full_name || 'Customer'}
                               </h3>
                               <p className="text-sm text-muted-foreground flex items-center gap-1">
                                 <Clock className="w-3 h-3" />

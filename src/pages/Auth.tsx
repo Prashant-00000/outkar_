@@ -19,8 +19,8 @@ export default function Auth() {
   const [mode, setMode] = useState<'signin' | 'signup'>(
     searchParams.get('mode') === 'signup' ? 'signup' : 'signin'
   );
-  const [role, setRole] = useState<'worker' | 'hirer'>(
-    (searchParams.get('role') as 'worker' | 'hirer') || 'hirer'
+  const [role, setRole] = useState<'worker' | 'customer'>(
+    (searchParams.get('role') as 'worker' | 'customer') || 'customer'
   );
 
   const [email, setEmail] = useState('');
@@ -140,11 +140,11 @@ export default function Auth() {
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"
-                      className={`p-4 rounded-lg border-2 text-left transition-all ${role === 'hirer'
-                          ? 'border-primary bg-primary/5'
-                          : 'border-border hover:border-primary/50'
+                      className={`p-4 rounded-lg border-2 text-left transition-all ${role === 'customer'
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-primary/50'
                         }`}
-                      onClick={() => setRole('hirer')}
+                      onClick={() => setRole('customer')}
                     >
                       <span className="font-semibold text-foreground block">Hire Workers</span>
                       <span className="text-sm text-muted-foreground">Find help for my needs</span>
@@ -152,8 +152,8 @@ export default function Auth() {
                     <button
                       type="button"
                       className={`p-4 rounded-lg border-2 text-left transition-all ${role === 'worker'
-                          ? 'border-primary bg-primary/5'
-                          : 'border-border hover:border-primary/50'
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-primary/50'
                         }`}
                       onClick={() => setRole('worker')}
                     >
@@ -276,7 +276,7 @@ export default function Auth() {
             {mode === 'signin'
               ? 'Access your dashboard to manage your profile, view requests, and connect with opportunities.'
               : role === 'worker'
-                ? 'Create your profile, showcase your skills, and connect with hirers looking for your expertise.'
+                ? 'Create your profile, showcase your skills, and connect with customers looking for your expertise.'
                 : 'Browse verified workers, read reviews, and hire the right person for your needs with confidence.'}
           </p>
         </div>

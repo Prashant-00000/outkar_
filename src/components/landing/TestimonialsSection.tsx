@@ -31,7 +31,7 @@ export function TestimonialsSection() {
         <div className="text-center mb-12">
           <h2 className="section-title">What Our Users Say</h2>
           <p className="section-subtitle mx-auto">
-            Join thousands of satisfied hirers and workers
+            Join thousands of satisfied customers and workers
           </p>
         </div>
 

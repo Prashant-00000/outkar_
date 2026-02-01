@@ -13,7 +13,7 @@ const steps = [
         icon: UserCheck,
         title: 'Compare',
         description: 'View profiles, ratings, reviews, and pricing to find your perfect match.',
-        detailedDescription: 'Review detailed worker profiles including verified credentials, past work history, hirer reviews, ratings, and competitive pricing. Make an informed decision with transparent information.',
+        detailedDescription: 'Review detailed worker profiles including verified credentials, past work history, customer reviews, ratings, and competitive pricing. Make an informed decision with transparent information.',
     },
     {
         icon: Calendar,
@@ -25,7 +25,7 @@ const steps = [
         icon: ThumbsUp,
         title: 'Done',
         description: 'Get your work done by a trusted professional. Leave a review to help others.',
-        detailedDescription: 'Once the job is completed, rate your experience and leave a review. Your feedback helps maintain quality standards and assists other hirers in making the right choice.',
+        detailedDescription: 'Once the job is completed, rate your experience and leave a review. Your feedback helps maintain quality standards and assists other customers in making the right choice.',
     },
 ];
 
@@ -96,7 +96,7 @@ export default function HowItWorks() {
                             Ready to Get Started?
                         </h2>
                         <p className="text-lg text-muted-foreground mb-8">
-                            Join thousands of satisfied hirers who have found reliable workers through our platform.
+                            Join thousands of satisfied customers who have found reliable workers through our platform.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <a

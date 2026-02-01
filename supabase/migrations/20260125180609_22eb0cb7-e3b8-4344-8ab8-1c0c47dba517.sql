@@ -1,5 +1,5 @@
 -- Create enum for user roles
-CREATE TYPE public.user_role AS ENUM ('worker', 'hirer');
+CREATE TYPE public.user_role AS ENUM ('worker', 'customer');
 
 -- Create enum for job categories
 CREATE TYPE public.job_category AS ENUM ('cook', 'cleaner', 'driver', 'plumber', 'electrician', 'gardener', 'painter', 'carpenter', 'babysitter', 'caretaker');
@@ -12,7 +12,7 @@ CREATE TABLE public.profiles (
   email TEXT NOT NULL,
   phone TEXT,
   avatar_url TEXT,
-  role user_role NOT NULL DEFAULT 'hirer',
+  role user_role NOT NULL DEFAULT 'customer',
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
@@ -48,7 +48,7 @@ CREATE TABLE public.worker_skills (
 CREATE TABLE public.reviews (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   worker_id UUID REFERENCES public.worker_profiles(id) ON DELETE CASCADE NOT NULL,
-  hirer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  customer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
   comment TEXT,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
@@ -58,7 +58,7 @@ CREATE TABLE public.reviews (
 CREATE TABLE public.hire_requests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   worker_id UUID REFERENCES public.worker_profiles(id) ON DELETE CASCADE NOT NULL,
-  hirer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  customer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   message TEXT,
   status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected', 'completed')),
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
@@ -93,14 +93,14 @@ CREATE POLICY "Workers can delete their skills" ON public.worker_skills FOR DELE
 
 -- Reviews policies
 CREATE POLICY "Reviews are viewable by everyone" ON public.reviews FOR SELECT USING (true);
-CREATE POLICY "Hirers can create reviews" ON public.reviews FOR INSERT WITH CHECK (auth.uid() = hirer_id);
+CREATE POLICY "Customers can create reviews" ON public.reviews FOR INSERT WITH CHECK (auth.uid() = customer_id);
 
 -- Hire requests policies
 CREATE POLICY "Workers can view their hire requests" ON public.hire_requests FOR SELECT USING (
   EXISTS (SELECT 1 FROM public.worker_profiles WHERE id = worker_id AND user_id = auth.uid())
-  OR hirer_id = auth.uid()
+  OR customer_id = auth.uid()
 );
-CREATE POLICY "Hirers can create hire requests" ON public.hire_requests FOR INSERT WITH CHECK (auth.uid() = hirer_id);
+CREATE POLICY "Customers can create hire requests" ON public.hire_requests FOR INSERT WITH CHECK (auth.uid() = customer_id);
 CREATE POLICY "Workers can update hire request status" ON public.hire_requests FOR UPDATE USING (
   EXISTS (SELECT 1 FROM public.worker_profiles WHERE id = worker_id AND user_id = auth.uid())
 );

@@ -127,7 +127,7 @@ export default function WorkerProfile() {
           rating,
           comment,
           created_at,
-          profiles:hirer_id (full_name)
+          profiles:customer_id (full_name)
         `)
         .eq('worker_id', id)
         .order('created_at', { ascending: false });
@@ -155,7 +155,7 @@ export default function WorkerProfile() {
 
       const { error } = await supabase.from('hire_requests').insert({
         worker_id: worker.id,
-        hirer_id: user.id,
+        customer_id: user.id,
         message: translatedMessage,
         message_original: originalMessage,
         message_language: detectedLanguage,
@@ -326,8 +326,8 @@ export default function WorkerProfile() {
                               <Star
                                 key={i}
                                 className={`w-4 h-4 ${i < review.rating
-                                    ? 'text-accent fill-accent'
-                                    : 'text-muted'
+                                  ? 'text-accent fill-accent'
+                                  : 'text-muted'
                                   }`}
                               />
                             ))}
