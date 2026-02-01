@@ -31,7 +31,7 @@ export function TestimonialsSection() {
         <div className="text-center mb-12">
           <h2 className="section-title">What Our Users Say</h2>
           <p className="section-subtitle mx-auto">
-            Join thousands of satisfied customers and workers
+            Join thousands of satisfied hirers and workers
           </p>
         </div>
 
@@ -42,7 +42,7 @@ export function TestimonialsSection() {
               className="card-elevated p-6 relative"
             >
               <Quote className="absolute top-6 right-6 w-8 h-8 text-primary/10" />
-              
+
               {/* Rating */}
               <div className="flex gap-1 mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (

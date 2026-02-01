@@ -97,7 +97,7 @@ export default function Categories() {
                                     Trusted Reviews
                                 </h3>
                                 <p className="text-muted-foreground">
-                                    Read real reviews from verified customers to make informed decisions
+                                    Read real reviews from verified hirers to make informed decisions
                                 </p>
                             </div>
                         </div>

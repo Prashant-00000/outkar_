@@ -67,7 +67,7 @@ export default function WorkerProfile() {
   const { user } = useAuth();
   const { translateSingle, isTranslating } = useTranslation();
   const { toast } = useToast();
-  
+
   const [worker, setWorker] = useState<WorkerProfile | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [skills, setSkills] = useState<string[]>([]);
@@ -127,7 +127,7 @@ export default function WorkerProfile() {
           rating,
           comment,
           created_at,
-          profiles:customer_id (full_name)
+          profiles:hirer_id (full_name)
         `)
         .eq('worker_id', id)
         .order('created_at', { ascending: false });
@@ -148,14 +148,14 @@ export default function WorkerProfile() {
     try {
       // Translate the message if it's in an Indian language
       const translation = await translateSingle('message', hireMessage);
-      
+
       const translatedMessage = translation?.translated || hireMessage;
       const originalMessage = translation?.isTranslated ? hireMessage : null;
       const detectedLanguage = translation?.detectedLanguage || null;
 
       const { error } = await supabase.from('hire_requests').insert({
         worker_id: worker.id,
-        customer_id: user.id,
+        hirer_id: user.id,
         message: translatedMessage,
         message_original: originalMessage,
         message_language: detectedLanguage,
@@ -325,11 +325,10 @@ export default function WorkerProfile() {
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
-                                className={`w-4 h-4 ${
-                                  i < review.rating
+                                className={`w-4 h-4 ${i < review.rating
                                     ? 'text-accent fill-accent'
                                     : 'text-muted'
-                                }`}
+                                  }`}
                               />
                             ))}
                           </div>
